@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FF LOCKER | Admin</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+table{width:100%;border-collapse:collapse;font-size:0.8rem}
+th,td{padding:8px;border-bottom:1px solid #222;text-align:left}
+th{color:#00ff96}
+.stats{display:flex;gap:12px;margin-bottom:16px}
+.stat{flex:1;background:#0d0d15;padding:12px;border-radius:8px;text-align:center}
+.stat b{display:block;font-size:1.4rem;color:#00ff96}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="container" style="max-width:900px">
+  <div class="logo">FF<span>LOCKER</span> ADMIN</div>
+  <div class="card" id="loginCard">
+    <h2>ADMIN LOGIN</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="text" id="name" placeholder="Name (Admin)">
+    <input type="password" id="pass" placeholder="Password">
+    <button class="btn primary" id="btnLogin">LOGIN</button>
+  </div>
+  <div id="dash" class="hidden">
+    <div class="stats" id="stats"></div>
+    <div class="card">
+      <h2>GENERATE KEYS</h2>
+      <input type="number" id="keyCount" value="5" min="1" max="50">
+      <button class="btn primary" id="btnGen">GENERATE</button>
+      <pre id="keyOut" style="margin-top:12px;background:#0d0d15;padding:12px;border-radius:6px;font-size:0.8rem;white-space:pre-wrap"></pre>
+    </div>
+    <div class="admin-grid">
+      <div class="card">
+        <h2>USERS</h2>
+        <div id="userTable"></div>
+      </div>
+      <div class="card">
+        <h2>KEYS</h2>
+        <div id="keyTable"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+let adminToken = null;
+const API = '/api';
+const $ = id => document.getElementById(id);
+
+$('btnLogin').onclick = async () => {
+  const r = await fetch(API + '/admin/login', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      email: $('email').value,
+      name: $('name').value,
+      password: $('pass').value
+    })
+  });
+  const d = await r.json();
+  if (d.ok) {
+    adminToken = d.token;
+    $('loginCard').classList.add('hidden');
+    $('dash').classList.remove('hidden');
+    refresh();
+  } else alert(d.msg);
+};
+
+$('btnGen').onclick = async () => {
+  const r = await fetch(API + '/admin/gen-key', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({token: adminToken, count: +$('keyCount').value})
+  });
+  const d = await r.json();
+  if (d.ok) {
+    $('keyOut').textContent = d.keys.join('\\n');
+    refresh();
+  }
+};
+
+async function refresh() {
+  const s = await (await fetch(API + '/admin/stats')).json();
+  $('stats').innerHTML = `
+    <div class="stat"><b>${s.keys}</b>Keys</div>
+    <div class="stat"><b>${s.used}</b>Used</div>
+    <div class="stat"><b>${s.users}</b>Users</div>
+    <div class="stat"><b>${s.binds}</b>Binds</div>`;
+  const users = await (await fetch(API + '/admin/users')).json();
+  $('userTable').innerHTML = '<table><tr><th>UID</th><th>HWID</th><th>Packages</th></tr>' +
+    users.map(u => `<tr><td>${u.uid}</td><td>${u.hwid.slice(0,12)}...</td><td>${u.packages.join(', ')}</td></tr>`).join('') + '</table>';
+  const keys = await (await fetch(API + '/admin/keys')).json();
+  $('keyTable').innerHTML = '<table><tr><th>Key</th><th>Status</th></tr>' +
+    keys.slice(-20).reverse().map(k => `<tr><td>${k.key}</td><td>${k.used?'USED':'FREE'}</td></tr>`).join('') + '</table>';
+}
+</script>
+</body>
+</html>
