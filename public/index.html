@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FF LOCKER | Secure Access</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="container" id="landing">
+  <div class="logo">FF<span>LOCKER</span></div>
+  <p class="tag">HARDWARE LOCKED • KEY ACTIVATED • PRIVATE BUILD</p>
+  <div class="card">
+    <h2>MACHINE BIND</h2>
+    <p class="desc">Download the binder. It collects HWID, registers the machine, then returns you here with LED status.</p>
+    <a href="/api/download-binder" class="btn primary" id="btnDownload">DOWNLOAD BINDER</a>
+    <div class="status-led" id="led">
+      <span class="dot"></span>
+      <span class="txt">WAITING FOR BIND</span>
+    </div>
+  </div>
+  <div class="card hidden" id="keyCard">
+    <h2>ENTER KEY</h2>
+    <input type="text" id="keyInput" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19">
+    <button class="btn primary" id="btnKey">CONFIRM KEY</button>
+  </div>
+  <div class="card hidden" id="uidCard">
+    <h2>FREE FIRE UID</h2>
+    <input type="text" id="uidInput" placeholder="Enter Free Fire UID">
+    <select id="pkgSelect">
+      <option value="headlock">Headlock + FOV + Bullets</option>
+      <option value="esp">ESP Full (Login + Distance)</option>
+      <option value="full">Full Pack (Headlock + ESP)</option>
+    </select>
+    <button class="btn primary" id="btnUid">ACTIVATE PACKAGE</button>
+  </div>
+</div>
+
+<div class="menu-overlay hidden" id="menuOverlay">
+  <div class="float-menu" id="floatMenu">
+    <div class="menu-header">
+      <span>FF LOCKER v1.0</span>
+      <button id="btnCloseMenu">×</button>
+    </div>
+    <div class="menu-tabs">
+      <button class="tab active" data-tab="headlock">HEAD LOCK</button>
+      <button class="tab" data-tab="esp">ESP</button>
+    </div>
+    <div class="tab-content" id="tab-headlock">
+      <label class="switch"><input type="checkbox" id="chkHeadlock"><span class="slider"></span> Head Lock 100%</label>
+      <label class="switch"><input type="checkbox" id="chkBullets"><span class="slider"></span> Infinite Bullets</label>
+      <label>FOV Boost <input type="range" id="fovRange" min="60" max="120" value="90"><span id="fovVal">90</span></label>
+      <p class="note">Camera auto-aligns. No need to turn angle.</p>
+    </div>
+    <div class="tab-content hidden" id="tab-esp">
+      <label class="switch"><input type="checkbox" id="chkEsp"><span class="slider"></span> ESP On</label>
+      <label class="switch"><input type="checkbox" id="chkLogin"><span class="slider"></span> Show Login Name</label>
+      <label class="switch"><input type="checkbox" id="chkDist"><span class="slider"></span> Distance</label>
+      <label class="switch"><input type="checkbox" id="chkBox"><span class="slider"></span> Box ESP</label>
+    </div>
+    <button class="btn start" id="btnStart">START</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
